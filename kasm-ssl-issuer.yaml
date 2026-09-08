@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-kasm-prod
+spec:
+  acme:
+    server: https://letsencrypt.org
+    email: yza.1994s@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-kasm-prod-key
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+            
