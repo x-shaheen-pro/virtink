@@ -6,57 +6,39 @@ metadata:
   labels:
     app: kasm-workspaces-host
 spec:
-  # تفعيل التشغيل التلقائي للخادم فور توليده
   runPolicy: Always
-  
   template:
     spec:
       domain:
-        # الهندسة البرمجية لنواة الخادم (تفعيل الـ KVM وتسريع المعالج)
         cpu:
           sockets: 1
           cores: 2
           threads: 2
-          model: host-passthrough # لتمرير ميزات المعالج الحقيقي وتفعيل الـ Nested Virtualization لـ Kasm
-        
-        # تخصيص الذاكرة العشوائية مع تفعيل الإدارة الديناميكية (Memory Ballooning)
+          model: host-passthrough
         memory:
           size: 4Gi
           slots: 1
-          maxSize: 8Gi # يسمح للخادم بالتوسع برمجياً حتى 8 جيجابايت عند ضغط مستخدمي Kasm
-        
-        # تفعيل تقنيات المحاكاة فائقة الخفة وتقليل الـ Overhead
+          maxSize: 8Gi
         features:
           acpi: {}
           apic: {}
           kvm:
-            hidden: false # إظهار تقنية KVM للحاوية لتتمكن من تشغيل أسطح مكتب Kasm المعزولة
-        
-        # إعدادات الأقراص التخزينية فائقة السرعة
+            hidden: false
         devices:
           disks:
             - name: system-disk
               bootOrder: 1
-              virtio: {} # استخدام تعريفات VirtIO لأعلى سرعة قراءة وكتابة (I/O)
-          
-          # إعداد الشبكة لتمرير حزم الـ WebRTC والبث الخاص بـ Kasm بدون تأخير (Latency)
+              virtio: {}
           interfaces:
             - name: eth0
               bridge: {}
               masquerade: {}
               model: virtio
-
-      # تحديد مصادر وحجم القرص الصلب لنظام التشغيل (Ubuntu 22.04 LTS أو 24.04 LTS الموصى به لـ Kasm)
       volumes:
         - name: system-disk
           containerDisk:
-            image: smartxworks/ubuntu-cloudimg:22.04 # نسخة السحاب الخفيفة والمجهزة لـ Virtink
+            image: smartxworks/ubuntu-cloudimg:22.04
             imagePullPolicy: IfNotPresent
-          # يمكنك أيضاً ربطه بـ PersistentVolumeClaim (PVC) لحفظ بيانات Kasm بشكل دائم:
-          # persistentVolumeClaim:
-          #   claimName: kasm-storage-pvc
-
-      # إعدادات الشبكة التابعة لـ Kubernetes / Virtink Cluster
       networks:
         - name: eth0
           pod: {}
