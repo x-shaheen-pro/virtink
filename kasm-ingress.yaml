@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kasm-ingress-routing
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-kasm-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - y-z-a-shaheen.sslip.io
+      secretName: kasm-ssl-tls-secret
+  rules:
+    - host: y-z-a-shaheen.sslip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kasm-network-service
+                port:
+                  number: 443
+                  
