@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kasm-network-service
+  namespace: default
+spec:
+  # ربط الخدمة مباشرة بالـ VPS الذي قمنا بتوليده سابقاً
+  selector:
+    app: kasm-workspaces-host
+  
+  # تحويل المنفذ الخارجي إلى المنفذ الداخلي للخادم
+  ports:
+    - name: https-traffic
+      protocol: TCP
+      port: 443        # المنفذ الذي ستدخل منه عبر الرابط الخارجي
+      targetPort: 443  # المنfذ الافتراضي الذي يعمل عليه Kasm داخل الـ VPS
+  
+  # تفعيل نوع الـ Service لإنشاء رابط IP خارجي تلقائياً
+  type: LoadBalancer
+
