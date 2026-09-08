@@ -1,0 +1,59 @@
+apiVersion: virtink.smartx.works/v1alpha1
+kind: VirtualMachine
+metadata:
+  name: kasm-vps-core
+  namespace: default
+  labels:
+    app: kasm-workspaces-host
+spec:
+  runPolicy: Always
+  template:
+    spec:
+      domain:
+        cpu:
+          sockets: 1
+          cores: 2
+          threads: 2
+          model: host-passthrough
+        memory:
+          size: 4Gi
+          slots: 1
+          maxSize: 8Gi
+        features:
+          acpi: {}
+          apic: {}
+          kvm:
+            hidden: false
+        devices:
+          disks:
+            - name: system-disk
+              bootOrder: 1
+              virtio: {}
+            - name: cloudinit-disk
+              virtio: {}
+          interfaces:
+            - name: eth0
+              bridge: {}
+              masquerade: {}
+              model: virtio
+      volumes:
+        - name: system-disk
+          containerDisk:
+            image: smartxworks/ubuntu-cloudimg:22.04
+            imagePullPolicy: IfNotPresent
+        - name: cloudinit-disk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              upgrade_packages: true
+              runcmd:
+                - apt-get update
+                - apt-get install -y apt-transport-https ca-certificates curl software-properties-common wget
+                - cd /tmp
+                - wget https://amazonaws.com
+                - tar -xf kasm_release_1.15.0.06fdc8.tar.gz
+                - sudo bash kasm_release/install.sh --accept-eula --swap-size 4096
+      networks:
+        - name: eth0
+          pod: {}
+
